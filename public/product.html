@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品详情 - 分销商城</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="header-logo" onclick="goHome()">分销商城</div>
+      <nav class="header-nav">
+        <a href="/index.html">首页</a>
+        <a href="/user.html">个人中心</a>
+      </nav>
+      <div class="header-user" id="headerUser"></div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <div class="product-detail" id="productDetail">
+      <div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <p>加载中...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="orderModal" style="display:none;">
+    <div class="modal-content">
+      <h3 class="modal-title">确认订单</h3>
+      <div id="orderProductInfo"></div>
+      <div class="form-group">
+        <label>收货人姓名</label>
+        <input type="text" id="receiverName" placeholder="请输入收货人姓名">
+      </div>
+      <div class="form-group">
+        <label>收货人电话</label>
+        <input type="tel" id="receiverPhone" placeholder="请输入收货人电话">
+      </div>
+      <div class="form-group">
+        <label>收货地址</label>
+        <input type="text" id="receiverAddress" placeholder="请输入详细收货地址">
+      </div>
+      <div class="form-group">
+        <label>备注（选填）</label>
+        <input type="text" id="orderRemark" placeholder="订单备注">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeOrderModal()">取消</button>
+        <button class="btn-confirm" onclick="submitOrder()" id="submitOrderBtn">提交订单</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentProduct = null;
+    let quantity = 1;
+
+    function goHome() {
+      window.location.href = '/index.html';
+    }
+
+    function updateHeader() {
+      const user = storage.getUser();
+      const headerUser = document.getElementById('headerUser');
+      
+      if (user) {
+        headerUser.innerHTML = `
+          <div class="avatar" onclick="goUserCenter()">${user.nickname ? user.nickname.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}</div>
+          <button class="btn-logout" onclick="handleLogout()">退出</button>
+        `;
+      } else {
+        headerUser.innerHTML = `
+          <a href="/login.html" class="btn-primary-small" style="padding:6px 16px;border-radius:6px;font-size:13px;background:#667eea;color:white;">登录/注册</a>
+        `;
+      }
+    }
+
+    function goUserCenter() {
+      window.location.href = '/user.html';
+    }
+
+    function handleLogout() {
+      logout();
+    }
+
+    async function loadProduct() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      
+      if (!productId) {
+        showError('商品不存在');
+        return;
+      }
+
+      const product = await request(`/product/detail/${productId}`);
+      
+      if (product) {
+        currentProduct = product;
+        renderProduct(product);
+      } else {
+        showError('商品加载失败');
+      }
+    }
+
+    function renderProduct(product) {
+      const container = document.getElementById('productDetail');
+      const commission = (product.price * product.commission_rate / 100).toFixed(2);
+      
+      container.innerHTML = `
+        <img class="product-detail-image" src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%23f0f0f0%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22>商品图片</text></svg>'">
+        <div class="product-detail-info">
+          <h1 class="product-detail-name">${product.name}</h1>
+          <div class="product-detail-price">
+            <span class="price-current">¥${formatMoney(product.price)}</span>
+            ${product.original_price > 0 ? `<span class="price-original">¥${formatMoney(product.original_price)}</span>` : ''}
+            <span class="commission-tag">分享赚 ¥${commission}</span>
+          </div>
+          <div class="product-detail-desc">
+            <p>${product.description || '暂无描述'}</p>
+          </div>
+          <div class="product-detail-stock">
+            <span>库存：${product.stock} 件</span>
+            <span style="margin-left:24px;">销量：${product.sales} 件</span>
+            <span style="margin-left:24px;">佣金比例：${product.commission_rate}%</span>
+          </div>
+          <div class="quantity-section">
+            <span class="quantity-label">数量</span>
+            <div class="quantity-control">
+              <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+              <input type="text" class="quantity-input" id="quantityInput" value="1" readonly>
+              <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-add-cart" onclick="shareProduct()">分享赚钱</button>
+            <button class="btn-buy-now" onclick="openOrderModal()">立即购买</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function changeQuantity(delta) {
+      if (!currentProduct) return;
+      
+      quantity += delta;
+      if (quantity < 1) quantity = 1;
+      if (quantity > currentProduct.stock) {
+        quantity = currentProduct.stock;
+        toast('库存不足', 'warning');
+      }
+      document.getElementById('quantityInput').value = quantity;
+    }
+
+    function shareProduct() {
+      if (!storage.getToken()) {
+        toast('请先登录', 'error');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1000);
+        return;
+      }
+
+      const user = storage.getUser();
+      const shareUrl = `${window.location.origin}/login.html?parentId=${user.id}`;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          toast(`分享链接已复制，邀请好友注册可赚佣金！`, 'success', 3000);
+        }).catch(() => {
+          showShareLink(shareUrl);
+        });
+      } else {
+        showShareLink(shareUrl);
+      }
+    }
+
+    function showShareLink(url) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.style.display = 'flex';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3 class="modal-title">分享赚钱</h3>
+          <p style="color:#666;margin-bottom:16px;">将下方链接分享给好友，好友注册并下单后，你将获得佣金奖励！</p>
+          <div style="background:#f5f5f5;padding:12px;border-radius:6px;word-break:break-all;margin-bottom:20px;font-size:13px;color:#333;">${url}</div>
+          <div class="modal-footer">
+            <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+          </div>
+        </div>
+      `;
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+      document.body.appendChild(modal);
+    }
+
+    function openOrderModal() {
+      if (!storage.getToken()) {
+        toast('请先登录', 'error');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1000);
+        return;
+      }
+
+      if (!currentProduct) return;
+
+      document.getElementById('orderModal').style.display = 'flex';
+      document.getElementById('orderProductInfo').innerHTML = `
+        <div style="display:flex;gap:16px;padding:16px;background:#f9f9f9;border-radius:8px;margin-bottom:20px;">
+          <img src="${currentProduct.image}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;">
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#333;margin-bottom:4px;">${currentProduct.name}</div>
+            <div style="color:#ff4d4f;font-weight:bold;">¥${formatMoney(currentProduct.price)} x ${quantity}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:18px;color:#ff4d4f;font-weight:bold;">¥${formatMoney(currentProduct.price * quantity)}</div>
+            <div style="font-size:12px;color:#52c41a;">预计赚 ¥${formatMoney(currentProduct.price * quantity * currentProduct.commission_rate / 100)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function closeOrderModal() {
+      document.getElementById('orderModal').style.display = 'none';
+    }
+
+    async function submitOrder() {
+      const receiverName = document.getElementById('receiverName').value.trim();
+      const receiverPhone = document.getElementById('receiverPhone').value.trim();
+      const receiverAddress = document.getElementById('receiverAddress').value.trim();
+      const remark = document.getElementById('orderRemark').value.trim();
+      const btn = document.getElementById('submitOrderBtn');
+
+      if (!receiverName || !receiverPhone || !receiverAddress) {
+        toast('请填写完整的收货信息', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '提交中...';
+
+      const data = await request('/order/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: [{ productId: currentProduct.id, quantity }],
+          receiverName,
+          receiverPhone,
+          receiverAddress,
+          remark
+        })
+      });
+
+      btn.disabled = false;
+      btn.textContent = '提交订单';
+
+      if (data) {
+        toast('订单创建成功，请完成支付', 'success');
+        
+        const payResult = await request(`/order/pay/${data.orderId}`, {
+          method: 'POST'
+        });
+        
+        if (payResult !== null) {
+          toast('支付成功', 'success');
+          closeOrderModal();
+          setTimeout(() => {
+            window.location.href = '/user.html?tab=orders';
+          }, 1000);
+        }
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('productDetail').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">❌</div>
+          <p>${msg}</p>
+          <button onclick="goHome()" style="margin-top:16px;padding:10px 24px;background:#667eea;color:white;border-radius:6px;">返回首页</button>
+        </div>
+      `;
+    }
+
+    (async function init() {
+      updateHeader();
+      await loadProduct();
+    })();
+  </script>
+</body>
+</html>

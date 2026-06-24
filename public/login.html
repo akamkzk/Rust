@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 分销商城</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h1>分销商城</h1>
+        <p>购物省钱，分享赚钱</p>
+      </div>
+
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchTab('login')">登录</div>
+        <div class="auth-tab" onclick="switchTab('register')">注册</div>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginUsername">用户名</label>
+          <input type="text" id="loginUsername" placeholder="请输入用户名" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">密码</label>
+          <input type="password" id="loginPassword" placeholder="请输入密码" required>
+        </div>
+        <button type="submit" class="btn-primary" id="loginBtn">登录</button>
+      </form>
+
+      <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="regUsername">用户名</label>
+          <input type="text" id="regUsername" placeholder="请输入用户名（3-20个字符）" required>
+        </div>
+        <div class="form-group">
+          <label for="regNickname">昵称</label>
+          <input type="text" id="regNickname" placeholder="请输入昵称">
+        </div>
+        <div class="form-group">
+          <label for="regPhone">手机号</label>
+          <input type="tel" id="regPhone" placeholder="请输入手机号">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">密码</label>
+          <input type="password" id="regPassword" placeholder="请输入密码（至少6位）" required>
+        </div>
+        <div class="form-group">
+          <label for="regParentId">推荐人ID（选填）</label>
+          <input type="number" id="regParentId" placeholder="请输入推荐人ID">
+          <div class="hint">填写推荐人ID可加入其分销团队</div>
+        </div>
+        <button type="submit" class="btn-primary" id="registerBtn">注册</button>
+      </form>
+
+      <div class="auth-footer">
+        <span id="footerText">还没有账号？</span>
+        <a href="javascript:void(0)" id="footerLink" onclick="switchTab('register')">立即注册</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    function switchTab(tab) {
+      const loginTab = document.querySelectorAll('.auth-tab')[0];
+      const registerTab = document.querySelectorAll('.auth-tab')[1];
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const footerText = document.getElementById('footerText');
+      const footerLink = document.getElementById('footerLink');
+
+      if (tab === 'login') {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        footerText.textContent = '还没有账号？';
+        footerLink.textContent = '立即注册';
+        footerLink.onclick = () => switchTab('register');
+      } else {
+        loginTab.classList.remove('active');
+        registerTab.classList.add('active');
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        footerText.textContent = '已有账号？';
+        footerLink.textContent = '立即登录';
+        footerLink.onclick = () => switchTab('login');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+
+      if (!username || !password) {
+        toast('请填写用户名和密码', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '登录中...';
+
+      const data = await request('/user/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password })
+      });
+
+      btn.disabled = false;
+      btn.textContent = '登录';
+
+      if (data) {
+        storage.setToken(data.token);
+        storage.setUser(data.user);
+        toast('登录成功', 'success');
+        setTimeout(() => {
+          window.location.href = '/index.html';
+        }, 800);
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('regUsername').value.trim();
+      const nickname = document.getElementById('regNickname').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const parentId = document.getElementById('regParentId').value;
+      const btn = document.getElementById('registerBtn');
+
+      if (!username || !password) {
+        toast('请填写用户名和密码', 'error');
+        return;
+      }
+
+      if (username.length < 3 || username.length > 20) {
+        toast('用户名长度应为3-20个字符', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        toast('密码长度不能少于6位', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '注册中...';
+
+      const body = { username, password };
+      if (nickname) body.nickname = nickname;
+      if (phone) body.phone = phone;
+      if (parentId) body.parentId = parseInt(parentId);
+
+      const data = await request('/user/register', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+
+      btn.disabled = false;
+      btn.textContent = '注册';
+
+      if (data) {
+        storage.setToken(data.token);
+        storage.setUser(data.user);
+        toast('注册成功', 'success');
+        setTimeout(() => {
+          window.location.href = '/index.html';
+        }, 800);
+      }
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentId = urlParams.get('parentId');
+    if (parentId) {
+      document.getElementById('regParentId').value = parentId;
+      switchTab('register');
+    }
+
+    if (storage.getToken()) {
+      window.location.href = '/index.html';
+    }
+  </script>
+</body>
+</html>
