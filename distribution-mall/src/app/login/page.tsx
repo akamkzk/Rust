@@ -68,7 +68,11 @@ function LoginContent() {
       await login(account, password);
       router.push(redirectTo);
     } catch (error) {
-      setErrorMessage('登录失败，请检查账号和密码');
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('登录失败，请检查账号和密码');
+      }
     } finally {
       setIsLoading(false);
     }

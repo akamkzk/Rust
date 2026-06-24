@@ -111,10 +111,14 @@ function RegisterContent() {
 
     setIsLoading(true);
     try {
-      await register(username, email, password, inviteCode || undefined);
+      await register(username, email, password, inviteCode || undefined, phone);
       router.push('/');
     } catch (error) {
-      setErrorMessage('注册失败，请稍后重试');
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('注册失败，请稍后重试');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -18,12 +18,14 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  phone?: string;
   avatar?: string;
   inviteCode: string;
   invitedBy?: string;
   balance: number;
   totalCommission: number;
   createdAt: string;
+  password?: string;
 }
 
 export interface Product {
@@ -103,6 +105,7 @@ const initialState: StoreState = {
 };
 
 const STORAGE_KEY = "distribution-mall-store";
+const USERS_STORAGE_KEY = "distribution-mall-users";
 
 function loadState(): StoreState {
   if (typeof window === "undefined") {
@@ -125,6 +128,28 @@ function saveState(state: StoreState) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
     console.error("Failed to save state to localStorage:", error);
+  }
+}
+
+function loadUsers(): User[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const saved = window.localStorage.getItem(USERS_STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+    console.error("Failed to load users from localStorage:", error);
+  }
+  return [];
+}
+
+function saveUsers(users: User[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  } catch (error) {
+    console.error("Failed to save users to localStorage:", error);
   }
 }
 
@@ -267,7 +292,7 @@ function storeReducer(state: StoreState, action: StoreAction): StoreState {
 interface StoreContextType {
   state: StoreState;
   login: (email: string, password: string) => Promise<User>;
-  register: (username: string, email: string, password: string, inviteCode?: string) => Promise<User>;
+  register: (username: string, email: string, password: string, inviteCode?: string, phone?: string) => Promise<User>;
   logout: () => void;
   addToCart: (product: Product, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
@@ -291,39 +316,74 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   const login = async (email: string, password: string): Promise<User> => {
-    void password;
-    const mockUser: User = {
-      id: `user_${Date.now()}`,
-      username: email.split("@")[0],
-      email,
-      inviteCode: generateInviteCode(),
-      balance: 0,
-      totalCommission: 0,
-      createdAt: new Date().toISOString(),
-    };
-    dispatch({ type: "LOGIN", payload: mockUser });
-    return mockUser;
+    const users = loadUsers();
+    const user = users.find(
+      (u) => u.email === email || u.username === email || u.phone === email
+    );
+
+    if (!user) {
+      throw new Error("用户不存在");
+    }
+
+    if (user.password && user.password !== password) {
+      throw new Error("密码错误");
+    }
+
+    const { password: _, ...safeUser } = user;
+    dispatch({ type: "LOGIN", payload: safeUser as User });
+    return safeUser as User;
   };
 
   const register = async (
     username: string,
     email: string,
     password: string,
-    inviteCode?: string
+    inviteCode?: string,
+    phone?: string
   ): Promise<User> => {
-    void password;
-    const mockUser: User = {
+    const users = loadUsers();
+
+    const existingUser = users.find((u) => u.email === email);
+    if (existingUser) {
+      throw new Error("该邮箱已被注册");
+    }
+
+    const existingUsername = users.find((u) => u.username === username);
+    if (existingUsername) {
+      throw new Error("该用户名已被使用");
+    }
+
+    let invitedBy: string | undefined;
+    if (inviteCode) {
+      const inviter = users.find((u) => u.inviteCode === inviteCode);
+      if (inviter) {
+        invitedBy = inviter.id;
+      }
+    }
+
+    const newUser: User = {
       id: `user_${Date.now()}`,
       username,
       email,
+      phone,
       inviteCode: generateInviteCode(),
-      invitedBy: inviteCode,
+      invitedBy,
       balance: 0,
       totalCommission: 0,
       createdAt: new Date().toISOString(),
+      password,
     };
-    dispatch({ type: "REGISTER", payload: mockUser });
-    return mockUser;
+
+    users.push(newUser);
+    saveUsers(users);
+
+    if (invitedBy) {
+      dispatch({ type: "ADD_TEAM_MEMBER", payload: newUser });
+    }
+
+    const { password: _, ...safeUser } = newUser;
+    dispatch({ type: "REGISTER", payload: safeUser as User });
+    return safeUser as User;
   };
 
   const logout = () => {
