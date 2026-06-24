@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 - 分销商城</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="header-logo" onclick="goHome()">分销商城</div>
+      <nav class="header-nav">
+        <a href="/index.html">首页</a>
+        <a href="/user.html" class="active">个人中心</a>
+      </nav>
+      <div class="header-user" id="headerUser"></div>
+    </div>
+  </header>
+
+  <div class="container user-center">
+    <div class="user-sidebar">
+      <div class="user-menu-item active" data-tab="overview" onclick="switchTab('overview')">个人概览</div>
+      <div class="user-menu-item" data-tab="orders" onclick="switchTab('orders')">我的订单</div>
+      <div class="user-menu-item" data-tab="commission" onclick="switchTab('commission')">佣金明细</div>
+      <div class="user-menu-item" data-tab="team" onclick="switchTab('team')">我的团队</div>
+      <div class="user-menu-item" data-tab="withdraw" onclick="switchTab('withdraw')">提现管理</div>
+      <div class="user-menu-item" data-tab="share" onclick="switchTab('share')">分享推广</div>
+      <div class="user-menu-item" data-tab="profile" onclick="switchTab('profile')">个人资料</div>
+    </div>
+
+    <div class="user-content" id="userContent">
+      <div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <p>加载中...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="withdrawModal" style="display:none;">
+    <div class="modal-content">
+      <h3 class="modal-title">申请提现</h3>
+      <div style="background:#f6ffed;padding:16px;border-radius:8px;margin-bottom:20px;">
+        <div style="color:#52c41a;font-size:14px;">可用佣金</div>
+        <div style="color:#52c41a;font-size:28px;font-weight:bold;" id="availableCommission">¥0.00</div>
+      </div>
+      <div class="form-group">
+        <label>提现金额</label>
+        <input type="number" id="withdrawAmount" placeholder="请输入提现金额" min="0">
+      </div>
+      <div class="form-group">
+        <label>收款账号</label>
+        <input type="text" id="payAccount" placeholder="请输入支付宝/微信/银行卡号">
+      </div>
+      <div class="form-group">
+        <label>收款人姓名</label>
+        <input type="text" id="payName" placeholder="请输入收款人姓名">
+      </div>
+      <div class="form-group">
+        <label>备注（选填）</label>
+        <input type="text" id="withdrawRemark" placeholder="备注信息">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeWithdrawModal()">取消</button>
+        <button class="btn-confirm" onclick="submitWithdraw()" id="submitWithdrawBtn">确认提现</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentTab = 'overview';
+    let userData = null;
+
+    function goHome() {
+      window.location.href = '/index.html';
+    }
+
+    function updateHeader() {
+      const user = storage.getUser();
+      const headerUser = document.getElementById('headerUser');
+      
+      if (user) {
+        headerUser.innerHTML = `
+          <div class="avatar">${user.nickname ? user.nickname.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}</div>
+          <button class="btn-logout" onclick="handleLogout()">退出</button>
+        `;
+      }
+    }
+
+    function handleLogout() {
+      logout();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      document.querySelectorAll('.user-menu-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === tab);
+      });
+      
+      loadTabContent(tab);
+    }
+
+    async function loadTabContent(tab) {
+      const content = document.getElementById('userContent');
+      
+      switch(tab) {
+        case 'overview':
+          await renderOverview(content);
+          break;
+        case 'orders':
+          await renderOrders(content);
+          break;
+        case 'commission':
+          await renderCommission(content);
+          break;
+        case 'team':
+          await renderTeam(content);
+          break;
+        case 'withdraw':
+          await renderWithdraw(content);
+          break;
+        case 'share':
+          renderShare(content);
+          break;
+        case 'profile':
+          await renderProfile(content);
+          break;
+      }
+    }
+
+    async function renderOverview(container) {
+      const stats = await request('/distribution/commission-stats');
+      const user = storage.getUser();
+      
+      container.innerHTML = `
+        <div class="user-info-card">
+          <div class="user-avatar">${user.nickname ? user.nickname.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}</div>
+          <div class="user-info-text">
+            <h3>${user.nickname || user.username}</h3>
+            <p>用户ID：${user.id} | 等级：V${user.level}</p>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card primary">
+            <div class="stat-value">¥${stats ? formatMoney(stats.totalCommission) : '0.00'}</div>
+            <div class="stat-label">累计佣金</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-value">¥${stats ? formatMoney(stats.availableCommission) : '0.00'}</div>
+            <div class="stat-label">可提现</div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-value">¥${stats ? formatMoney(stats.pendingCommission) : '0.00'}</div>
+            <div class="stat-label">待结算</div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-value">${stats ? stats.totalTeamCount : 0}</div>
+            <div class="stat-label">团队人数</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div style="background:white;padding:20px;border-radius:12px;text-align:center;cursor:pointer;" onclick="switchTab('orders')">
+            <div style="font-size:32px;margin-bottom:8px;">📦</div>
+            <div style="color:#666;font-size:14px;">我的订单</div>
+          </div>
+          <div style="background:white;padding:20px;border-radius:12px;text-align:center;cursor:pointer;" onclick="switchTab('team')">
+            <div style="font-size:32px;margin-bottom:8px;">👥</div>
+            <div style="color:#666;font-size:14px;">我的团队</div>
+          </div>
+          <div style="background:white;padding:20px;border-radius:12px;text-align:center;cursor:pointer;" onclick="switchTab('share')">
+            <div style="font-size:32px;margin-bottom:8px;">🔗</div>
+            <div style="color:#666;font-size:14px;">分享推广</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function renderOrders(container) {
+      const data = await request('/order/list?pageSize=20');
+      
+      let html = '<h3 style="margin-bottom:20px;font-size:20px;">我的订单</h3>';
+      
+      if (!data || data.list.length === 0) {
+        html += `
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <p>暂无订单</p>
+            <button onclick="goHome()" style="margin-top:16px;padding:10px 24px;background:#667eea;color:white;border-radius:6px;">去逛逛</button>
+          </div>
+        `;
+      } else {
+        html += '<div class="order-list">';
+        data.list.forEach(order => {
+          html += `
+            <div class="order-item">
+              <div class="order-header">
+                <span class="order-no">订单号：${order.order_no}</span>
+                <span class="order-status ${getOrderStatusClass(order.status)}">${getOrderStatusText(order.status)}</span>
+              </div>
+              ${order.items.map(item => `
+                <div class="order-product">
+                  <img class="order-product-image" src="${item.product_image}" alt="${item.product_name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><rect fill=%22%23f0f0f0%22 width=%2280%22 height=%2280%22/></svg>'">
+                  <div class="order-product-info">
+                    <div class="order-product-name">${item.product_name}</div>
+                    <div>
+                      <span class="order-product-price">¥${formatMoney(item.price)}</span>
+                      <span class="order-product-quantity">x${item.quantity}</span>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+              <div class="order-footer">
+                <div class="order-total">
+                  共${order.items.reduce((sum, item) => sum + item.quantity, 0)}件商品，实付：
+                  <span class="order-total-amount">¥${formatMoney(order.total_amount)}</span>
+                </div>
+                <div class="order-actions">
+                  ${order.status === 0 ? `
+                    <button class="btn-small btn-outline" onclick="cancelOrder(${order.id})">取消订单</button>
+                    <button class="btn-small btn-primary-small" onclick="payOrder(${order.id})">立即支付</button>
+                  ` : ''}
+                  ${order.status === 3 ? `
+                    <button class="btn-small btn-outline" onclick="goHome()">再次购买</button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      container.innerHTML = html;
+    }
+
+    async function payOrder(orderId) {
+      if (!confirm('确认支付该订单吗？')) return;
+      
+      const result = await request(`/order/pay/${orderId}`, {
+        method: 'POST'
+      });
+      
+      if (result !== null) {
+        toast('支付成功', 'success');
+        loadTabContent('orders');
+        loadTabContent('overview');
+      }
+    }
+
+    async function cancelOrder(orderId) {
+      if (!confirm('确认取消该订单吗？')) return;
+      
+      const result = await request(`/order/cancel/${orderId}`, {
+        method: 'POST'
+      });
+      
+      if (result !== null) {
+        toast('订单已取消', 'success');
+        loadTabContent('orders');
+      }
+    }
+
+    async function renderCommission(container) {
+      const data = await request('/distribution/commissions?pageSize=30');
+      
+      let html = '<h3 style="margin-bottom:20px;font-size:20px;">佣金明细</h3>';
+      
+      if (!data || data.list.length === 0) {
+        html += `
+          <div class="empty-state">
+            <div class="empty-icon">💰</div>
+            <p>暂无佣金记录</p>
+          </div>
+        `;
+      } else {
+        html += '<div class="commission-list">';
+        data.list.forEach(comm => {
+          const statusText = comm.status === 0 ? '待结算' : comm.status === 1 ? '已结算' : '已取消';
+          const statusClass = comm.status === 0 ? 'pending' : comm.status === 1 ? 'settled' : '';
+          html += `
+            <div class="commission-item">
+              <div class="commission-info">
+                <div class="commission-desc">${comm.level === 1 ? '一级' : '二级'}佣金 - ${comm.from_nickname || comm.from_username || '下级会员'}</div>
+                <div class="commission-time">${formatDate(comm.created_at)}</div>
+              </div>
+              <div class="commission-amount">+¥${formatMoney(comm.amount)}</div>
+              <span class="commission-status ${statusClass}">${statusText}</span>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      container.innerHTML = html;
+    }
+
+    async function renderTeam(container) {
+      let html = `
+        <h3 style="margin-bottom:20px;font-size:20px;">我的团队</h3>
+        <div class="team-tabs">
+          <div class="team-tab active" data-level="1" onclick="switchTeamLevel(1)">一级团队</div>
+          <div class="team-tab" data-level="2" onclick="switchTeamLevel(2)">二级团队</div>
+        </div>
+        <div id="teamContent"></div>
+      `;
+      
+      container.innerHTML = html;
+      loadTeamList(1);
+    }
+
+    function switchTeamLevel(level) {
+      document.querySelectorAll('.team-tab').forEach(tab => {
+        tab.classList.toggle('active', parseInt(tab.dataset.level) === level);
+      });
+      loadTeamList(level);
+    }
+
+    async function loadTeamList(level) {
+      const content = document.getElementById('teamContent');
+      const data = await request(`/distribution/team?level=${level}&pageSize=50`);
+      
+      if (!data || data.list.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <p>暂无${level === 1 ? '一级' : '二级'}团队成员</p>
+            <p style="font-size:13px;color:#999;margin-top:8px;">分享推广链接邀请好友加入吧！</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '<div class="team-list">';
+      data.list.forEach(member => {
+        html += `
+          <div class="team-member">
+            <div class="team-avatar">${member.nickname ? member.nickname.charAt(0).toUpperCase() : member.username.charAt(0).toUpperCase()}</div>
+            <div class="team-info">
+              <div class="team-name">${member.nickname || member.username}</div>
+              <div class="team-time">加入时间：${formatDate(member.created_at)}</div>
+            </div>
+            <span class="team-level">V${member.level}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      content.innerHTML = html;
+    }
+
+    async function renderWithdraw(container) {
+      const stats = await request('/distribution/commission-stats');
+      const data = await request('/distribution/withdraws?pageSize=20');
+      const user = storage.getUser();
+      
+      let html = `
+        <h3 style="margin-bottom:20px;font-size:20px;">提现管理</h3>
+        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:24px;border-radius:12px;color:white;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="opacity:0.8;font-size:14px;">可提现佣金</div>
+            <div style="font-size:36px;font-weight:bold;margin-top:8px;">¥${stats ? formatMoney(stats.availableCommission) : '0.00'}</div>
+          </div>
+          <button onclick="openWithdrawModal()" style="padding:12px 28px;background:white;color:#667eea;border-radius:8px;font-size:15px;font-weight:500;">申请提现</button>
+        </div>
+        <h4 style="margin-bottom:16px;font-size:16px;">提现记录</h4>
+      `;
+      
+      if (!data || data.list.length === 0) {
+        html += `
+          <div class="empty-state">
+            <div class="empty-icon">💳</div>
+            <p>暂无提现记录</p>
+          </div>
+        `;
+      } else {
+        html += '<div class="commission-list">';
+        data.list.forEach(w => {
+          const statusText = ['待审核', '审核通过', '审核拒绝', '已打款'][w.status] || '未知';
+          const statusClass = w.status === 0 ? 'pending' : w.status === 3 ? 'settled' : '';
+          html += `
+            <div class="commission-item">
+              <div class="commission-info">
+                <div class="commission-desc">提现申请</div>
+                <div class="commission-time">${formatDate(w.created_at)}</div>
+              </div>
+              <div class="commission-amount" style="color:#ff4d4f;">-¥${formatMoney(w.amount)}</div>
+              <span class="commission-status ${statusClass}">${statusText}</span>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      container.innerHTML = html;
+    }
+
+    function openWithdrawModal() {
+      const user = storage.getUser();
+      document.getElementById('availableCommission').textContent = `¥${formatMoney(user.available_commission)}`;
+      document.getElementById('withdrawAmount').value = '';
+      document.getElementById('payAccount').value = '';
+      document.getElementById('payName').value = '';
+      document.getElementById('withdrawRemark').value = '';
+      document.getElementById('withdrawModal').style.display = 'flex';
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdrawModal').style.display = 'none';
+    }
+
+    async function submitWithdraw() {
+      const amount = parseFloat(document.getElementById('withdrawAmount').value);
+      const payAccount = document.getElementById('payAccount').value.trim();
+      const payName = document.getElementById('payName').value.trim();
+      const remark = document.getElementById('withdrawRemark').value.trim();
+      const btn = document.getElementById('submitWithdrawBtn');
+      const user = storage.getUser();
+
+      if (!amount || amount <= 0) {
+        toast('请输入提现金额', 'error');
+        return;
+      }
+
+      if (amount > user.available_commission) {
+        toast('可用佣金不足', 'error');
+        return;
+      }
+
+      if (!payAccount || !payName) {
+        toast('请填写收款账号和收款人', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '提交中...';
+
+      const result = await request('/distribution/withdraw', {
+        method: 'POST',
+        body: JSON.stringify({ amount, payAccount, payName, remark })
+      });
+
+      btn.disabled = false;
+      btn.textContent = '确认提现';
+
+      if (result) {
+        const newUser = storage.getUser();
+        newUser.available_commission = result.available_commission;
+        storage.setUser(newUser);
+        
+        toast('提现申请提交成功', 'success');
+        closeWithdrawModal();
+        loadTabContent('withdraw');
+        loadTabContent('overview');
+      }
+    }
+
+    function renderShare(container) {
+      const user = storage.getUser();
+      const shareUrl = `${window.location.origin}/login.html?parentId=${user.id}`;
+      
+      container.innerHTML = `
+        <h3 style="margin-bottom:20px;font-size:20px;">分享推广</h3>
+        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px;border-radius:12px;color:white;text-align:center;margin-bottom:24px;">
+          <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+          <h3 style="font-size:24px;margin-bottom:12px;">邀请好友加入</h3>
+          <p style="opacity:0.9;font-size:15px;">好友通过你的链接注册并下单，你将获得佣金奖励</p>
+        </div>
+        <div style="background:white;padding:24px;border-radius:12px;border:1px solid #eee;">
+          <h4 style="margin-bottom:16px;font-size:16px;">我的推广链接</h4>
+          <div style="display:flex;gap:12px;margin-bottom:20px;">
+            <input type="text" value="${shareUrl}" readonly style="flex:1;padding:12px;background:#f5f5f5;border-radius:8px;font-size:13px;color:#333;" id="shareUrlInput">
+            <button onclick="copyShareUrl()" style="padding:12px 24px;background:#667eea;color:white;border-radius:8px;font-size:14px;">复制链接</button>
+          </div>
+          <div style="padding:16px;background:#fffbe6;border-radius:8px;font-size:13px;color:#d48806;">
+            <p style="margin-bottom:8px;">📌 推广说明：</p>
+            <ul style="padding-left:20px;line-height:1.8;">
+              <li>一级分销：直接邀请的好友下单，可获得100%佣金比例</li>
+              <li>二级分销：好友邀请的好友下单，可获得50%佣金比例</li>
+              <li>佣金在订单支付完成后自动结算到账</li>
+              <li>可在"佣金明细"中查看详细记录</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('shareUrlInput');
+      input.select();
+      document.execCommand('copy');
+      toast('推广链接已复制', 'success');
+    }
+
+    async function renderProfile(container) {
+      const user = storage.getUser();
+      
+      container.innerHTML = `
+        <h3 style="margin-bottom:20px;font-size:20px;">个人资料</h3>
+        <div style="max-width:400px;">
+          <div class="form-group">
+            <label>用户ID</label>
+            <input type="text" value="${user.id}" readonly style="background:#f5f5f5;color:#999;">
+          </div>
+          <div class="form-group">
+            <label>用户名</label>
+            <input type="text" value="${user.username}" readonly style="background:#f5f5f5;color:#999;">
+          </div>
+          <div class="form-group">
+            <label>昵称</label>
+            <input type="text" id="profileNickname" value="${user.nickname || ''}" placeholder="请输入昵称">
+          </div>
+          <div class="form-group">
+            <label>手机号</label>
+            <input type="tel" id="profilePhone" value="${user.phone || ''}" placeholder="请输入手机号">
+          </div>
+          <div class="form-group">
+            <label>用户等级</label>
+            <input type="text" value="V${user.level}" readonly style="background:#f5f5f5;color:#999;">
+          </div>
+          <button class="btn-primary" onclick="saveProfile()" style="padding:12px;">保存修改</button>
+        </div>
+      `;
+    }
+
+    async function saveProfile() {
+      const nickname = document.getElementById('profileNickname').value.trim();
+      const phone = document.getElementById('profilePhone').value.trim();
+
+      const result = await request('/user/info', {
+        method: 'PUT',
+        body: JSON.stringify({ nickname, phone })
+      });
+
+      if (result) {
+        storage.setUser(result);
+        toast('保存成功', 'success');
+        updateHeader();
+      }
+    }
+
+    (async function init() {
+      if (!checkAuth()) return;
+      
+      updateHeader();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const tab = urlParams.get('tab');
+      if (tab) {
+        switchTab(tab);
+      } else {
+        loadTabContent('overview');
+      }
+    })();
+  </script>
+</body>
+</html>

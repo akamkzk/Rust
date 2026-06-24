@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分销商城</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="header-logo" onclick="goHome()">分销商城</div>
+      <nav class="header-nav">
+        <a href="/index.html" class="active">首页</a>
+        <a href="/user.html">个人中心</a>
+      </nav>
+      <div class="header-user" id="headerUser">
+        <a href="/login.html" class="btn-primary-small" style="padding:6px 16px;border-radius:6px;font-size:13px;">登录/注册</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner">
+    <div class="container">
+      <h2>购物省钱 · 分享赚钱</h2>
+      <p>成为分销会员，分享好物赚取佣金</p>
+    </div>
+  </div>
+
+  <div class="categories">
+    <div class="category-list" id="categoryList">
+      <div class="category-item active" data-id="0">全部</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section-title">热门商品</div>
+    <div class="product-grid" id="productGrid">
+      <div class="empty-state">
+        <div class="empty-icon">🛍️</div>
+        <p>加载中...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentCategory = 0;
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+
+    function goHome() {
+      window.location.href = '/index.html';
+    }
+
+    function updateHeader() {
+      const user = storage.getUser();
+      const headerUser = document.getElementById('headerUser');
+      
+      if (user) {
+        headerUser.innerHTML = `
+          <div class="avatar" onclick="goUserCenter()">${user.nickname ? user.nickname.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}</div>
+          <button class="btn-logout" onclick="handleLogout()">退出</button>
+        `;
+      } else {
+        headerUser.innerHTML = `
+          <a href="/login.html" class="btn-primary-small" style="padding:6px 16px;border-radius:6px;font-size:13px;background:#667eea;color:white;">登录/注册</a>
+        `;
+      }
+    }
+
+    function goUserCenter() {
+      window.location.href = '/user.html';
+    }
+
+    function handleLogout() {
+      logout();
+    }
+
+    async function loadCategories() {
+      const categories = await request('/product/categories');
+      if (categories) {
+        const categoryList = document.getElementById('categoryList');
+        categoryList.innerHTML = '<div class="category-item active" data-id="0" onclick="selectCategory(0)">全部</div>';
+        
+        categories.forEach(cat => {
+          const item = document.createElement('div');
+          item.className = 'category-item';
+          item.dataset.id = cat.id;
+          item.textContent = cat.name;
+          item.onclick = () => selectCategory(cat.id);
+          categoryList.appendChild(item);
+        });
+      }
+    }
+
+    function selectCategory(categoryId) {
+      currentCategory = categoryId;
+      currentPage = 1;
+      hasMore = true;
+      
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.classList.toggle('active', parseInt(item.dataset.id) === categoryId);
+      });
+      
+      loadProducts(true);
+    }
+
+    async function loadProducts(reset = false) {
+      if (isLoading || (!hasMore && !reset)) return;
+      
+      isLoading = true;
+      
+      const params = new URLSearchParams({
+        page: currentPage,
+        pageSize: 20
+      });
+      
+      if (currentCategory > 0) {
+        params.append('categoryId', currentCategory);
+      }
+      
+      const data = await request(`/product/list?${params.toString()}`);
+      
+      if (data) {
+        const productGrid = document.getElementById('productGrid');
+        
+        if (reset) {
+          productGrid.innerHTML = '';
+        }
+        
+        if (data.list.length === 0 && reset) {
+          productGrid.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📦</div>
+              <p>暂无商品</p>
+            </div>
+          `;
+          isLoading = false;
+          return;
+        }
+        
+        data.list.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.onclick = () => goProductDetail(product.id);
+          card.innerHTML = `
+            <img class="product-image" src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/><text x=%22100%22 y=%22100%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22>商品图片</text></svg>'">
+            <div class="product-info">
+              <div class="product-name">${product.name}</div>
+              <div class="product-price-row">
+                <span class="product-price">¥${formatMoney(product.price)}</span>
+                ${product.original_price > 0 ? `<span class="product-original-price">¥${formatMoney(product.original_price)}</span>` : ''}
+              </div>
+              <div class="product-meta">
+                <span class="product-sales">已售${product.sales}</span>
+                <span class="product-commission">赚${formatMoney(product.price * product.commission_rate / 100)}</span>
+              </div>
+            </div>
+          `;
+          productGrid.appendChild(card);
+        });
+        
+        hasMore = data.page < data.totalPages;
+        currentPage++;
+      }
+      
+      isLoading = false;
+    }
+
+    function goProductDetail(id) {
+      window.location.href = `/product.html?id=${id}`;
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      
+      if (scrollTop + clientHeight >= scrollHeight - 200) {
+        loadProducts();
+      }
+    });
+
+    (async function init() {
+      updateHeader();
+      await loadCategories();
+      await loadProducts(true);
+    })();
+  </script>
+</body>
+</html>
