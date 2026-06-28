@@ -5,8 +5,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SplashIntro from '@/components/SplashIntro';
 import WorkBadge from '@/components/WorkBadge';
+import SearchOverlay from '@/components/SearchOverlay';
+import ChatPanel from '@/components/ChatPanel';
+import SettingsPanel from '@/components/SettingsPanel';
 import Home from '@/pages/Home';
 import Forum from '@/pages/Forum';
+import Post from '@/pages/Post';
+import Discover from '@/pages/Discover';
+import Feed from '@/pages/Feed';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -30,6 +36,9 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/forum" element={<Forum />} />
+          <Route path="/post/:id" element={<Post />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/feed" element={<Feed />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -47,6 +56,9 @@ export default function App() {
         <AnimatedRoutes />
         <Footer />
         <WorkBadge />
+        <SearchOverlay />
+        <ChatPanel />
+        <SettingsPanel />
       </div>
     </Router>
   );
