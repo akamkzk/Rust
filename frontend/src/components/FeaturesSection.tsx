@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Zap, Shield, Users } from 'lucide-react';
 import WhaleParticleCloud from './WhaleParticleCloud';
+import { CardEffectPulse, CardEffectShield, CardEffectNetwork } from './CardEffects';
 
 const features = [
   {
@@ -8,18 +9,21 @@ const features = [
     title: '实时互动',
     description: '毫秒级延迟的消息推送系统，让每一次交流都如同面对面。采用WebSocket协议，确保连接的稳定与高效。',
     gradient: 'from-cyber-cyan to-cyan-400',
+    effect: CardEffectPulse,
   },
   {
     icon: Shield,
     title: '隐私安全',
     description: '端到端加密通信，零知识证明架构。你的数据只属于你自己，没有人能够窥探你的数字世界。',
     gradient: 'from-cyber-indigo to-purple-400',
+    effect: CardEffectShield,
   },
   {
     icon: Users,
     title: '智能推荐',
     description: '基于联邦学习的推荐算法，在不侵犯隐私的前提下，为你匹配志同道合的伙伴与优质内容。',
     gradient: 'from-cyber-emerald to-green-400',
+    effect: CardEffectNetwork,
   },
 ];
 
@@ -85,12 +89,16 @@ export default function FeaturesSection() {
         >
           {features.map((feature) => {
             const Icon = feature.icon;
+            const Effect = feature.effect;
             return (
               <motion.div
                 key={feature.title}
                 variants={cardVariants}
-                className="group relative p-8 rounded-2xl glass hover:bg-white/[0.07] transition-all duration-500"
+                className="group relative p-8 rounded-2xl glass hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
               >
+                {/* Sci-fi card effect */}
+                <Effect />
+
                 {/* Hover glow */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
@@ -104,10 +112,10 @@ export default function FeaturesSection() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-lg font-semibold text-white mb-3 tracking-wide">
+                <h3 className="relative text-lg font-semibold text-white mb-3 tracking-wide">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-slate-500 leading-relaxed">
+                <p className="relative text-sm text-slate-500 leading-relaxed">
                   {feature.description}
                 </p>
 
