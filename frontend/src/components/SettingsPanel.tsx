@@ -78,7 +78,7 @@ export default function SettingsPanel() {
         whileTap={{ scale: 0.9 }}
         onClick={() => setSettingsOpen(!settingsOpen)}
         className="
-          fixed bottom-24 right-6 z-40
+          fixed bottom-36 sm:bottom-24 right-4 sm:right-6 z-40
           flex items-center justify-center
           w-12 h-12 rounded-full
           bg-white/5 backdrop-blur-xl border border-white/10
@@ -114,7 +114,7 @@ export default function SettingsPanel() {
               exit="exit"
               className="
                 fixed top-0 right-0 z-50 h-full
-                w-[340px] max-w-[90vw]
+                w-full sm:w-[340px] max-w-[90vw]
                 bg-cyber-surface/95 backdrop-blur-2xl
                 border-l border-white/10
                 shadow-2xl shadow-black/40

@@ -116,17 +116,17 @@ export default function SplashIntro({ onFinish }: SplashIntroProps) {
           />
 
           {/* Corner decorations */}
-          <div className="absolute top-8 left-8 w-12 h-12 border-l border-t border-cyber-cyan/40 z-10" />
-          <div className="absolute top-8 right-8 w-12 h-12 border-r border-t border-cyber-cyan/40 z-10" />
-          <div className="absolute bottom-8 left-8 w-12 h-12 border-l border-b border-cyber-cyan/40 z-10" />
-          <div className="absolute bottom-8 right-8 w-12 h-12 border-r border-b border-cyber-cyan/40 z-10" />
+          <div className="absolute top-4 sm:top-8 left-4 sm:left-8 w-8 h-8 sm:w-12 sm:h-12 border-l border-t border-cyber-cyan/40 z-10" />
+          <div className="absolute top-4 sm:top-8 right-4 sm:right-8 w-8 h-8 sm:w-12 sm:h-12 border-r border-t border-cyber-cyan/40 z-10" />
+          <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 w-8 h-8 sm:w-12 sm:h-12 border-l border-b border-cyber-cyan/40 z-10" />
+          <div className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 w-8 h-8 sm:w-12 sm:h-12 border-r border-b border-cyber-cyan/40 z-10" />
 
           {/* Top status bar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute top-0 left-0 right-0 z-10 px-8 py-2 flex items-center justify-between text-[10px] font-mono text-cyber-cyan/50 tracking-widest pointer-events-none"
+            className="absolute top-0 left-0 right-0 z-10 px-4 sm:px-8 py-2 flex items-center justify-between text-[8px] sm:text-[10px] font-mono text-cyber-cyan/50 tracking-widest pointer-events-none"
           >
             <span>SYS.INITIALIZE</span>
             <span>NEXUS_PROTOCOL_v2.4.1</span>
@@ -148,7 +148,7 @@ export default function SplashIntro({ onFinish }: SplashIntroProps) {
               }}
             >
               <span
-                className="font-display text-6xl md:text-8xl font-extrabold tracking-widest text-red-500/40"
+                className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-widest text-red-500/40"
                 style={{ mixBlendMode: 'screen', textShadow: '0 0 40px rgba(239,68,68,0.5)' }}
               >
                 {glitchText || finalText}
@@ -168,7 +168,7 @@ export default function SplashIntro({ onFinish }: SplashIntroProps) {
               }}
             >
               <span
-                className="font-display text-6xl md:text-8xl font-extrabold tracking-widest text-blue-500/40"
+                className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-widest text-blue-500/40"
                 style={{ mixBlendMode: 'screen', textShadow: '0 0 40px rgba(59,130,246,0.5)' }}
               >
                 {glitchText || finalText}
@@ -177,7 +177,7 @@ export default function SplashIntro({ onFinish }: SplashIntroProps) {
 
             {/* Main text */}
             <motion.h1
-              className="font-display text-6xl md:text-8xl font-extrabold tracking-widest text-white relative"
+              className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-widest text-white relative"
               style={{
                 textShadow: '0 0 40px rgba(6,182,212,0.6), 0 0 80px rgba(6,182,212,0.3), 0 0 120px rgba(99,102,241,0.2)',
               }}

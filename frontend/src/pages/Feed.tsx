@@ -63,8 +63,8 @@ export default function FeedPage() {
   const { feed } = useStore();
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
-      <div className="max-w-main mx-auto px-8 max-w-3xl">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 bg-cyber-black">
+      <div className="max-w-main mx-auto px-4 sm:px-8 max-w-3xl">
         {/* ---- 页面标题 ---- */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -74,7 +74,7 @@ export default function FeedPage() {
         >
           <div className="flex items-center gap-3 mb-2">
             <Zap className="w-7 h-7 text-cyber-cyan" strokeWidth={1.5} />
-            <h1 className="font-display text-3xl font-bold text-white tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
               动态广场
             </h1>
           </div>
@@ -96,12 +96,12 @@ export default function FeedPage() {
               <motion.div
                 key={item.id}
                 variants={itemVariants}
-                className="group glass rounded-2xl p-5 hover:border-cyber-cyan/15 transition-all duration-300"
+                className="group glass rounded-2xl p-4 sm:p-5 hover:border-cyber-cyan/15 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
                   {/* ---- 类型图标 ---- */}
                   <div
-                    className={`w-10 h-10 rounded-xl ${meta.bg} flex items-center justify-center shrink-0 ring-1 ring-white/5`}
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl ${meta.bg} flex items-center justify-center shrink-0 ring-1 ring-white/5`}
                   >
                     <Icon className={`w-4 h-4 ${meta.color}`} strokeWidth={1.5} />
                   </div>
@@ -109,7 +109,7 @@ export default function FeedPage() {
                   {/* ---- 内容区 ---- */}
                   <div className="flex-1 min-w-0">
                     {/* 用户 + 动作 */}
-                    <p className="text-sm text-slate-300 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                       <span className="font-semibold text-white group-hover:text-cyber-cyan transition-colors duration-300">
                         {item.user.name}
                       </span>

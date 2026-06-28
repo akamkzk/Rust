@@ -6,7 +6,7 @@ const titleChars = '连接未来'.split('');
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden px-4 sm:px-8">
       {/* 3D Interactive Particle Cloud */}
       <InteractiveParticleCloud />
 
@@ -57,17 +57,17 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-10"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass mb-10"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-cyan opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyber-cyan" />
             </span>
-            <span className="text-xs text-slate-400 tracking-widest">NEXUS PLATFORM v2.0</span>
+            <span className="text-[10px] sm:text-xs text-slate-400 tracking-widest">NEXUS PLATFORM v2.0</span>
           </motion.div>
 
           {/* Title */}
-          <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6">
+          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6">
             <span className="text-white">NEXUS</span>
             <br />
             <span className="text-gradient">
@@ -94,7 +94,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed px-4"
           >
             新一代科技社交平台，以去中心化架构重新定义连接方式。
             <br />
@@ -108,7 +108,7 @@ export default function HeroSection() {
             transition={{ duration: 0.6, delay: 1.5 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button className="group relative px-10 py-4 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-indigo text-white font-semibold text-sm tracking-wider overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-cyber-cyan/25">
+            <button className="group relative w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-indigo text-white font-semibold text-sm tracking-wider overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-cyber-cyan/25">
               <span className="relative z-10 flex items-center gap-2">
                 立即探索
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
@@ -116,7 +116,7 @@ export default function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-r from-cyber-indigo to-cyber-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
 
-            <button className="btn-primary flex items-center gap-2 text-sm">
+            <button className="btn-primary w-full sm:w-auto flex items-center gap-2 text-sm">
               <Sparkles className="w-4 h-4" strokeWidth={1.5} />
               <span>了解更多</span>
             </button>
@@ -128,7 +128,7 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}

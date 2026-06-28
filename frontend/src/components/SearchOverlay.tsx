@@ -86,7 +86,7 @@ export default function SearchOverlay() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.96 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="relative w-full max-w-xl mx-4 glass rounded-2xl overflow-hidden shadow-2xl shadow-black/40"
+            className="relative w-[calc(100vw-32px)] sm:w-[560px] mx-4 sm:mx-auto glass rounded-2xl overflow-hidden shadow-2xl shadow-black/40"
           >
             {/* 搜索输入框 */}
             <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
@@ -97,7 +97,7 @@ export default function SearchOverlay() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="搜索帖子或用户..."
-                className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none"
+                className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-slate-500 outline-none"
               />
               <button
                 onClick={handleClose}
@@ -133,10 +133,10 @@ export default function SearchOverlay() {
                         <FileText className="w-4 h-4 text-cyber-cyan" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-slate-200 group-hover:text-white transition-colors truncate">
+                        <p className="text-xs sm:text-sm text-slate-200 group-hover:text-white transition-colors truncate">
                           {post.title}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
                           {post.author.name} · {post.category} · {post.views.toLocaleString()} 浏览
                         </p>
                       </div>
@@ -163,10 +163,10 @@ export default function SearchOverlay() {
                         <User className="w-4 h-4 text-slate-400" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-slate-200 transition-colors truncate">
+                        <p className="text-xs sm:text-sm text-slate-200 transition-colors truncate">
                           {user.name}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5 truncate">
+                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5 truncate">
                           {user.bio}
                         </p>
                       </div>

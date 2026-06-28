@@ -93,8 +93,8 @@ export default function NotificationCenter() {
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="
-              absolute right-0 top-12
-              w-[380px] max-h-[480px]
+              absolute right-2 sm:right-0 top-12
+              w-[calc(100vw-32px)] sm:w-[380px] max-h-[480px]
               rounded-2xl overflow-hidden
               border border-white/10
               bg-slate-900/75 backdrop-blur-2xl

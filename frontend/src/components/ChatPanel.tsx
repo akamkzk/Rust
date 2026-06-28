@@ -46,9 +46,9 @@ export default function ChatPanel() {
         whileTap={{ scale: 0.9 }}
         onClick={() => setChatOpen(!chatOpen)}
         className="
-          fixed bottom-6 right-6 z-50
+          fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50
           flex items-center justify-center
-          w-14 h-14 rounded-full
+          w-11 h-11 sm:w-12 sm:h-12 rounded-full
           bg-gradient-to-br from-cyan-500 to-blue-600
           text-white shadow-lg shadow-cyan-500/30
           hover:shadow-cyan-500/50 transition-shadow
@@ -79,9 +79,9 @@ export default function ChatPanel() {
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="
-              fixed bottom-24 right-6 z-40
-              w-[720px] h-[520px] max-w-[calc(100vw-48px)]
-              rounded-2xl overflow-hidden
+              fixed bottom-0 right-0 sm:bottom-20 sm:right-6 z-40
+              w-full sm:w-[420px] h-full sm:h-[600px]
+              sm:rounded-2xl overflow-hidden
               border border-white/10
               bg-slate-900/70 backdrop-blur-2xl
               shadow-2xl shadow-black/50
@@ -89,12 +89,13 @@ export default function ChatPanel() {
             "
           >
             {/* ---- 左侧对话列表 ---- */}
-            <div className="
-              w-[260px] shrink-0
+            <div className={`
+              w-full sm:w-[260px] shrink-0
               border-r border-white/5
               flex flex-col
               bg-white/[0.02]
-            ">
+              ${activeConversation ? 'hidden sm:flex' : 'flex'}
+            `}>
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                 <h3 className="text-sm font-semibold text-white/90">聊天</h3>
                 <button

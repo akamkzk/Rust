@@ -46,7 +46,7 @@ const cardVariants = {
 
 export default function FeaturesSection() {
   return (
-    <section className="relative py-32 bg-cyber-surface overflow-hidden">
+    <section className="relative py-20 sm:py-32 bg-cyber-surface overflow-hidden">
       {/* 3D Whale Particle Cloud Background */}
       <div className="absolute inset-0 z-0">
         <WhaleParticleCloud />
@@ -62,7 +62,7 @@ export default function FeaturesSection() {
         />
       </div>
 
-      <div className="relative z-10 max-w-main mx-auto px-8">
+      <div className="relative z-10 max-w-main mx-auto px-4 sm:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -71,10 +71,10 @@ export default function FeaturesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
             为什么选择 <span className="text-gradient">NEXUS</span>
           </h2>
-          <p className="text-slate-500 max-w-xl mx-auto text-sm leading-relaxed">
+          <p className="text-slate-500 max-w-xl mx-auto text-sm leading-relaxed px-4">
             我们重新思考了社交网络的本质，以技术为驱动，打造更纯粹的连接体验
           </p>
         </motion.div>
@@ -85,7 +85,7 @@ export default function FeaturesSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {features.map((feature) => {
             const Icon = feature.icon;
@@ -94,7 +94,7 @@ export default function FeaturesSection() {
               <motion.div
                 key={feature.title}
                 variants={cardVariants}
-                className="group relative p-8 rounded-2xl glass hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
+                className="group relative p-6 sm:p-8 rounded-2xl glass hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
               >
                 {/* Sci-fi card effect */}
                 <Effect />
@@ -107,8 +107,8 @@ export default function FeaturesSection() {
                 />
 
                 {/* Icon */}
-                <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} bg-opacity-10 flex items-center justify-center mb-6 ring-1 ring-white/5`}>
-                  <Icon className="w-6 h-6 text-white" strokeWidth={1.5} />
+                <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${feature.gradient} bg-opacity-10 flex items-center justify-center mb-6 ring-1 ring-white/5`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={1.5} />
                 </div>
 
                 {/* Content */}

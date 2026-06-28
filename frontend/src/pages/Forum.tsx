@@ -14,8 +14,8 @@ export default function ForumPage() {
   const hotPosts = posts.filter((p) => p.isHot).slice(0, 5);
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
-      <div className="max-w-main mx-auto px-8">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 bg-cyber-black">
+      <div className="max-w-main mx-auto px-4 sm:px-8">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -23,7 +23,7 @@ export default function ForumPage() {
           transition={{ duration: 0.5 }}
           className="mb-10"
         >
-          <h1 className="font-display text-3xl font-bold text-white mb-2 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
             贴吧
           </h1>
           <p className="text-sm text-slate-500">探索话题，加入讨论，分享你的见解</p>
@@ -37,13 +37,13 @@ export default function ForumPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-2 mb-8 overflow-x-auto pb-2"
+              className="flex items-center gap-1 sm:gap-2 mb-8 overflow-x-auto pb-2"
             >
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`relative px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                  className={`relative px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-medium whitespace-nowrap transition-all duration-300 ${
                     activeCategory === cat
                       ? 'text-white bg-cyber-cyan/20 border border-cyber-cyan/40 shadow-lg shadow-cyber-cyan/10'
                       : 'text-slate-400 border border-white/5 hover:border-white/15 hover:text-slate-300'
@@ -61,7 +61,7 @@ export default function ForumPage() {
               ))}
 
               {/* Create Post Button */}
-              <button className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-indigo text-white text-sm font-medium hover:shadow-lg hover:shadow-cyber-cyan/25 transition-all duration-300 whitespace-nowrap">
+              <button className="w-full sm:w-auto sm:ml-auto flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-indigo text-white text-sm font-medium hover:shadow-lg hover:shadow-cyber-cyan/25 transition-all duration-300 whitespace-nowrap">
                 <Plus className="w-4 h-4" strokeWidth={2} />
                 发帖
               </button>
@@ -75,18 +75,18 @@ export default function ForumPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
-                  className="group glass-hover rounded-2xl p-5 cursor-pointer"
+                  className="group glass-hover rounded-2xl p-4 sm:p-5 cursor-pointer"
                 >
                   <div className="flex items-start gap-4">
                     {/* Author Avatar */}
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyber-cyan/30 to-cyber-indigo/30 flex items-center justify-center shrink-0 ring-1 ring-white/5">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cyber-cyan/30 to-cyber-indigo/30 flex items-center justify-center shrink-0 ring-1 ring-white/5">
                       <User className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <h3 className="text-sm font-semibold text-white group-hover:text-cyber-cyan transition-colors duration-300 truncate">
+                        <h3 className="text-xs sm:text-sm font-semibold text-white group-hover:text-cyber-cyan transition-colors duration-300 truncate">
                           {post.title}
                         </h3>
                         {post.isHot && (
@@ -96,7 +96,7 @@ export default function ForumPage() {
                       <p className="text-xs text-slate-500 mb-3 line-clamp-1">
                         {post.content}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-slate-600">
+                      <div className="flex items-center gap-4 text-[10px] sm:text-xs text-slate-600">
                         <span className="text-slate-400">{post.author.name}</span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" strokeWidth={1.5} />
@@ -106,7 +106,7 @@ export default function ForumPage() {
                     </div>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-4 text-xs text-slate-600 shrink-0">
+                    <div className="flex items-center gap-4 text-[10px] sm:text-xs text-slate-600 shrink-0">
                       <span className="flex items-center gap-1.5">
                         <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {post.replies}
@@ -127,7 +127,7 @@ export default function ForumPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="lg:col-span-1"
+            className="hidden lg:block lg:col-span-1"
           >
             {/* Hot Topics */}
             <div className="glass rounded-2xl p-6 sticky top-24">

@@ -46,8 +46,8 @@ export default function DiscoverPage() {
   const { discoverUsers, toggleFollow } = useStore();
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
-      <div className="max-w-main mx-auto px-8">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 bg-cyber-black">
+      <div className="max-w-main mx-auto px-4 sm:px-8">
         {/* ---- 页面标题 ---- */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -57,7 +57,7 @@ export default function DiscoverPage() {
         >
           <div className="flex items-center gap-3 mb-2">
             <Users className="w-7 h-7 text-cyber-cyan" strokeWidth={1.5} />
-            <h1 className="font-display text-3xl font-bold text-white tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
               发现用户
             </h1>
           </div>
@@ -75,7 +75,7 @@ export default function DiscoverPage() {
             <motion.div
               key={u.id}
               variants={cardVariants}
-              className="group glass rounded-2xl p-6 hover:border-cyber-cyan/20 transition-all duration-300"
+              className="group glass rounded-2xl p-4 sm:p-6 hover:border-cyber-cyan/20 transition-all duration-300"
             >
               {/* ---- 卡片顶部：头像 + 信息 ---- */}
               <div className="flex items-start gap-4 mb-4">
@@ -123,7 +123,7 @@ export default function DiscoverPage() {
               {/* ---- 关注/已关注按钮 ---- */}
               <button
                 onClick={() => toggleFollow(u.id)}
-                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium transition-all duration-300 ${
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${
                   u.isFollowing
                     ? 'bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan hover:bg-cyber-cyan/15'
                     : 'bg-white/5 border border-white/10 text-slate-300 hover:bg-cyber-cyan/10 hover:border-cyber-cyan/30 hover:text-cyber-cyan'

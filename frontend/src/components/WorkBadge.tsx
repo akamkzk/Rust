@@ -60,10 +60,8 @@ export default function WorkBadge() {
           // Small delay to prevent click from firing after drag
           setTimeout(() => setIsDragging(false), 50);
         }}
-        className="absolute pointer-events-auto cursor-grab active:cursor-grabbing group"
+        className="absolute top-2 right-2 sm:top-10 sm:right-40 pointer-events-auto cursor-grab active:cursor-grabbing group"
         style={{
-          top: 10,
-          right: 40,
           rotateX,
           rotateY,
           transformStyle: 'preserve-3d',
@@ -90,7 +88,7 @@ export default function WorkBadge() {
 
         {/* Flip container */}
         <motion.div
-          className="relative w-72 h-[310px]"
+          className="relative w-64 sm:w-72 h-[280px] sm:h-[310px]"
           style={{
             rotateY: flipRotation,
             transformStyle: 'preserve-3d',

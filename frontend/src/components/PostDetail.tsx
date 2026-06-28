@@ -15,8 +15,8 @@ export default function PostDetail() {
   // 帖子不存在
   if (!post) {
     return (
-      <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
-        <div className="max-w-main mx-auto px-8">
+      <div className="min-h-screen pt-20 sm:pt-24 pb-16 bg-cyber-black">
+        <div className="max-w-main mx-auto px-4 sm:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -28,7 +28,7 @@ export default function PostDetail() {
             <p className="text-sm text-slate-600 mb-8">该帖子可能已被删除或链接无效</p>
             <button
               onClick={() => navigate('/forum')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan text-sm hover:bg-cyber-cyan/20 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan text-xs sm:text-sm hover:bg-cyber-cyan/20 transition-all duration-300"
             >
               <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
               返回贴吧
@@ -56,8 +56,8 @@ export default function PostDetail() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
-      <div className="max-w-main mx-auto px-8">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 bg-cyber-black">
+      <div className="max-w-main mx-auto px-4 sm:px-8">
         <div className="max-w-3xl mx-auto">
           {/* 返回按钮 */}
           <motion.button
@@ -65,7 +65,7 @@ export default function PostDetail() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
             onClick={() => navigate('/forum')}
-            className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors mb-6 group"
+            className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 hover:text-slate-300 transition-colors mb-6 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={1.5} />
             返回贴吧
@@ -76,7 +76,7 @@ export default function PostDetail() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="glass rounded-3xl p-8 md:p-10 mb-8 relative overflow-hidden"
+            className="glass rounded-3xl p-5 sm:p-8 md:p-10 mb-8 relative overflow-hidden"
           >
             {/* 背景光晕 */}
             <div
@@ -92,7 +92,7 @@ export default function PostDetail() {
             </div>
 
             {/* 标题 */}
-            <h1 className="relative text-2xl md:text-3xl font-bold text-white mb-6 tracking-tight leading-tight">
+            <h1 className="relative text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 tracking-tight leading-tight">
               {post.title}
             </h1>
 
@@ -122,7 +122,7 @@ export default function PostDetail() {
             </div>
 
             {/* 内容 */}
-            <div className="relative text-sm text-slate-300 leading-relaxed space-y-4">
+            <div className="relative text-sm sm:text-base text-slate-300 leading-relaxed space-y-4">
               {post.content.split('\n').map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
               ))}
@@ -134,7 +134,7 @@ export default function PostDetail() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="glass rounded-3xl p-8 md:p-10"
+            className="glass rounded-3xl p-4 sm:p-5 md:p-10"
           >
             <div className="flex items-center gap-2.5 mb-8">
               <MessageSquare className="w-5 h-5 text-cyber-cyan" strokeWidth={1.5} />
