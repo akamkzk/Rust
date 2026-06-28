@@ -1,105 +1,70 @@
-import { useEffect, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
+import { motion, useSpring } from 'framer-motion';
 import { useStore } from '@/store/useStore';
-import { QrCode, Fingerprint, Wifi, Battery } from 'lucide-react';
+import { QrCode, Fingerprint, Wifi, Battery, GripHorizontal } from 'lucide-react';
 
 export default function WorkBadge() {
   const { user } = useStore();
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
   const rotateX = useSpring(0, { stiffness: 80, damping: 15 });
   const rotateY = useSpring(0, { stiffness: 80, damping: 15 });
-  const translateX = useSpring(0, { stiffness: 50, damping: 15 });
   const [mounted, setMounted] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const constraintsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
     rotateX.set(y * -15);
     rotateY.set(x * 15);
-    translateX.set(x * 8);
   };
 
   const handleMouseLeave = () => {
     rotateX.set(0);
     rotateY.set(0);
-    translateX.set(0);
   };
 
   return (
-    <div className="fixed top-0 right-8 z-40 pointer-events-none" style={{ perspective: '800px' }}>
-      {/* Lanyard */}
-      <svg
-        className="absolute top-0 pointer-events-none"
-        width="200"
-        height="180"
-        viewBox="0 0 200 180"
-        style={{ right: '10px' }}
-      >
-        {/* Lanyard strap */}
-        <motion.path
-          d="M 160 0 Q 180 40 170 80 Q 160 120 145 160"
-          fill="none"
-          stroke="url(#lanyardGradient)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
-        />
-        <defs>
-          <linearGradient id="lanyardGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.6" />
-            <stop offset="50%" stopColor="#6366f1" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      {/* Clip */}
+    <div ref={constraintsRef} className="fixed inset-0 z-40 pointer-events-none" style={{ perspective: '800px' }}>
       <motion.div
-        className="absolute pointer-events-none"
-        style={{ right: '42px', top: '152px' }}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.8 }}
-      >
-        <div className="w-8 h-5 rounded-t-md bg-gradient-to-b from-slate-400 to-slate-500 border border-slate-300/30"
-          style={{ boxShadow: '0 0 8px rgba(6,182,212,0.4)' }}
-        />
-      </motion.div>
-
-      {/* Badge Card */}
-      <motion.div
-        className="relative pointer-events-auto cursor-default"
+        drag
+        dragConstraints={constraintsRef}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setIsDragging(false)}
+        className="absolute pointer-events-auto cursor-grab active:cursor-grabbing group"
         style={{
+          top: 10,
+          right: 40,
           rotateX,
           rotateY,
-          x: translateX,
-          marginTop: '170px',
           transformStyle: 'preserve-3d',
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        initial={{ opacity: 0, y: -60, rotateZ: -15 }}
-        animate={mounted ? { opacity: 1, y: 0, rotateZ: 0 } : {}}
+        initial={{ opacity: 0, scale: 0.8, rotateZ: -15 }}
+        animate={mounted ? { opacity: 1, scale: 1, rotateZ: 0 } : {}}
         transition={{
           opacity: { duration: 0.6, delay: 0.6 },
-          y: { type: 'spring', stiffness: 60, damping: 12, delay: 0.6 },
+          scale: { type: 'spring', stiffness: 60, damping: 12, delay: 0.6 },
           rotateZ: { type: 'spring', stiffness: 60, damping: 12, delay: 0.6 },
         }}
       >
-        {/* Badge hole */}
+        {/* Lanyard hole */}
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full border-2 border-slate-500/50 bg-cyber-black z-10"
           style={{ boxShadow: 'inset 0 0 4px rgba(0,0,0,0.5)' }}
         />
+
+        {/* Drag handle hint */}
+        <div className="flex items-center justify-center pb-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <GripHorizontal className="w-4 h-4 text-slate-500" strokeWidth={1.5} />
+        </div>
 
         {/* Main card */}
         <div className="relative w-72 rounded-2xl overflow-hidden"
@@ -146,7 +111,6 @@ export default function WorkBadge() {
                   </div>
                 </div>
               </div>
-              {/* Photo hologram overlay */}
               <div className="absolute inset-0 rounded-lg opacity-20 pointer-events-none"
                 style={{
                   background: 'linear-gradient(135deg, rgba(6,182,212,0.5) 0%, transparent 50%, rgba(99,102,241,0.5) 100%)',
@@ -176,7 +140,6 @@ export default function WorkBadge() {
 
           {/* Barcode / QR section */}
           <div className="px-5 py-3 flex items-center justify-between">
-            {/* Barcode */}
             <div className="flex items-end gap-[1px] h-8">
               {[2,1,3,2,4,1,3,2,1,3,2,4,1,2,3,1,4,2,3,1,2,3,1,4,2,1].map((h, i) => (
                 <div
@@ -186,8 +149,6 @@ export default function WorkBadge() {
                 />
               ))}
             </div>
-
-            {/* QR code placeholder */}
             <div className="w-8 h-8 rounded border border-white/10 bg-white/5 flex items-center justify-center">
               <QrCode className="w-5 h-5 text-slate-500" strokeWidth={1} />
             </div>
@@ -214,11 +175,10 @@ export default function WorkBadge() {
           />
         </div>
 
-        {/* Shadow on "wall" */}
+        {/* Wall shadow */}
         <div className="absolute -bottom-2 left-2 right-2 h-4 rounded-full bg-black/30 blur-md -z-10" />
       </motion.div>
 
-      {/* Shimmer keyframes */}
       <style>{`
         @keyframes shimmer {
           0% { background-position: 200% 0; }
