@@ -59,8 +59,8 @@ export default function WorkBadge() {
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={() => setCollapsed(false)}
-            className="absolute top-2 right-2 sm:top-10 sm:right-40 pointer-events-auto z-40
-                       w-[25.6px] sm:w-[28.8px] h-[28px] sm:h-[31px]
+            className="absolute top-16 right-2 sm:top-20 sm:right-6 pointer-events-auto z-40
+                       w-[51.2px] sm:w-[57.6px] h-[56px] sm:h-[62px]
                        overflow-hidden rounded-[0.2rem]
                        border border-cyber-cyan/30
                        hover:border-cyber-cyan/60 hover:shadow-lg hover:shadow-cyber-cyan/20
@@ -69,7 +69,7 @@ export default function WorkBadge() {
               boxShadow: '0 0 20px rgba(6,182,212,0.15), 0 4px 16px rgba(0,0,0,0.4)',
             }}
           >
-            <div className="scale-[0.1] origin-top-left w-64 sm:w-72 h-[280px] sm:h-[310px]">
+            <div className="scale-[0.2] origin-top-left w-64 sm:w-72 h-[280px] sm:h-[310px]">
               <div
                 className="w-64 sm:w-72 h-[280px] sm:h-[310px] rounded-2xl overflow-hidden"
                 style={{
@@ -147,7 +147,7 @@ export default function WorkBadge() {
             dragMomentum={false}
             onDragStart={() => setIsDragging(true)}
             onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
-            className="absolute top-2 right-2 sm:top-10 sm:right-40 pointer-events-auto cursor-grab active:cursor-grabbing group"
+            className="absolute top-16 right-2 sm:top-20 sm:right-6 pointer-events-auto cursor-grab active:cursor-grabbing group"
             style={{
               rotateX,
               rotateY,
