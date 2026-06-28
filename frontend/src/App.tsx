@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SplashIntro from '@/components/SplashIntro';
+import WorkBadge from '@/components/WorkBadge';
 import Home from '@/pages/Home';
-import Profile from '@/pages/Profile';
 import Forum from '@/pages/Forum';
 
 const pageVariants = {
@@ -29,7 +29,6 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/forum" element={<Forum />} />
         </Routes>
       </motion.div>
@@ -47,6 +46,7 @@ export default function App() {
         <Navbar />
         <AnimatedRoutes />
         <Footer />
+        <WorkBadge />
       </div>
     </Router>
   );

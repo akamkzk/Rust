@@ -5,7 +5,6 @@ import { Hexagon, Menu, X, MessageCircle } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: '首页' },
-  { path: '/profile', label: '个人中心' },
   { path: '/forum', label: '贴吧' },
 ];
 

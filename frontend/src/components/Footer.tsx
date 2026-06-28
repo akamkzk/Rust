@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Hexagon } from 'lucide-react';
 
 const footerLinks = {
-  product: { title: '产品', links: ['首页', '个人中心', '贴吧', '关于我们'] },
+  product: { title: '产品', links: ['首页', '贴吧', '关于我们'] },
   support: { title: '支持', links: ['帮助中心', '社区规范', '隐私政策', '服务条款'] },
   contact: { title: '联系我们', links: ['官方邮箱', 'Twitter', 'Discord', 'GitHub'] },
 };
