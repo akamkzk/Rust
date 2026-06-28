@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Zap, Shield, Users } from 'lucide-react';
+import WhaleParticleCloud from './WhaleParticleCloud';
 
 const features = [
   {
@@ -41,15 +42,23 @@ const cardVariants = {
 
 export default function FeaturesSection() {
   return (
-    <section className="relative py-32 bg-cyber-surface">
-      {/* Background subtle gradient */}
-      <div className="absolute inset-0 opacity-30"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(6,182,212,0.08) 0%, transparent 60%)',
-        }}
-      />
+    <section className="relative py-32 bg-cyber-surface overflow-hidden">
+      {/* 3D Whale Particle Cloud Background */}
+      <div className="absolute inset-0 z-0">
+        <WhaleParticleCloud />
+      </div>
 
-      <div className="relative max-w-main mx-auto px-8">
+      {/* Gradient overlays */}
+      <div className="absolute inset-0 z-[1] pointer-events-none">
+        <div className="absolute inset-0 bg-cyber-surface/70" />
+        <div className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 30%, rgba(6,182,212,0.06) 0%, transparent 60%)',
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-main mx-auto px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
