@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import { User, MessageSquare, Heart, Bookmark, Edit3, MapPin, Calendar, FileText, ThumbsUp, MessageCircle } from 'lucide-react';
+import WorkBadge from '@/components/WorkBadge';
 
 const activityIcons = {
   post: FileText,
@@ -31,6 +32,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-cyber-black">
+      {/* Work Badge - hanging from top-right */}
+      <WorkBadge />
+
       <div className="max-w-main mx-auto px-8">
         {/* Profile Header */}
         <motion.div
