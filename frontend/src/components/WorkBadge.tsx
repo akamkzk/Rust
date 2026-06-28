@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, useSpring, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
-import { QrCode, Fingerprint, Wifi, Battery, GripHorizontal, Shield, Globe, Code2, Terminal, Cpu, MapPin, Mail, Calendar, Award, IdCard, X } from 'lucide-react';
+import { QrCode, Fingerprint, Wifi, Battery, GripHorizontal, Shield, Globe, Code2, Terminal, Cpu, MapPin, Mail, Calendar, Award, X } from 'lucide-react';
 
 export default function WorkBadge() {
   const { user } = useStore();
@@ -49,7 +49,7 @@ export default function WorkBadge() {
 
   return (
     <div ref={constraintsRef} className="fixed inset-0 z-40 pointer-events-none" style={{ perspective: '1000px' }}>
-      {/* ── Collapsed Button ──────────────────────────── */}
+      {/* ── Collapsed Mini Badge (1/10 scale) ──────────── */}
       <AnimatePresence>
         {collapsed && (
           <motion.button
@@ -60,20 +60,78 @@ export default function WorkBadge() {
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={() => setCollapsed(false)}
             className="absolute top-2 right-2 sm:top-10 sm:right-40 pointer-events-auto z-40
-                       w-11 h-11 sm:w-12 sm:h-12 rounded-full
-                       bg-gradient-to-br from-cyber-cyan/20 to-cyber-indigo/20
+                       w-[25.6px] sm:w-[28.8px] h-[28px] sm:h-[31px]
+                       overflow-hidden rounded-[0.2rem]
                        border border-cyber-cyan/30
-                       backdrop-blur-xl
-                       flex items-center justify-center
                        hover:border-cyber-cyan/60 hover:shadow-lg hover:shadow-cyber-cyan/20
-                       transition-all duration-300"
+                       transition-all duration-300 cursor-pointer"
             style={{
               boxShadow: '0 0 20px rgba(6,182,212,0.15), 0 4px 16px rgba(0,0,0,0.4)',
             }}
           >
-            <IdCard className="w-5 h-5 sm:w-6 sm:h-6 text-cyber-cyan" strokeWidth={1.5} />
+            <div className="scale-[0.1] origin-top-left w-64 sm:w-72 h-[280px] sm:h-[310px]">
+              <div
+                className="w-64 sm:w-72 h-[280px] sm:h-[310px] rounded-2xl overflow-hidden"
+                style={{
+                  background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)',
+                  boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(6,182,212,0.1), inset 0 1px 0 rgba(255,255,255,0.03)',
+                }}
+              >
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                  style={{
+                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)',
+                  }}
+                />
+                <div className="h-1 bg-gradient-to-r from-cyber-cyan via-cyber-indigo to-cyber-cyan" />
+                <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
+                    <span className="text-[10px] font-mono text-cyber-cyan/70 tracking-widest uppercase">NEXUS CORP</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                    <Wifi className="w-2.5 h-2.5" strokeWidth={2} />
+                    <Battery className="w-2.5 h-2.5" strokeWidth={2} />
+                  </div>
+                </div>
+                <div className="px-5 pb-3 flex gap-4">
+                  <div className="relative shrink-0">
+                    <div className="w-16 h-20 rounded-lg overflow-hidden bg-gradient-to-br from-cyber-cyan/30 to-cyber-indigo/30 border border-white/10">
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-cyber-cyan/20 flex items-center justify-center">
+                          <span className="font-display text-lg font-bold text-cyber-cyan">{user.name.charAt(0)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-display text-sm font-bold text-white tracking-wider mb-0.5 truncate">{user.name}</h3>
+                    <p className="text-[10px] text-cyber-cyan/80 font-mono mb-1.5">SENIOR DEVELOPER</p>
+                    <p className="text-[9px] text-slate-500 font-mono leading-relaxed">ID: NX-{user.id.padStart(6, '0')}</p>
+                    <p className="text-[9px] text-slate-500 font-mono">LVL: 07 | CLR: ALPHA</p>
+                  </div>
+                </div>
+                <div className="mx-5 border-t border-white/5" />
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-end gap-[1px] h-8">
+                    {[2,1,3,2,4,1,3,2,1,3,2,4,1,2,3,1,4,2,3,1,2,3,1,4,2,1].map((h, i) => (
+                      <div key={i} className="w-[1.5px] bg-white/60" style={{ height: `${h * 25}%` }} />
+                    ))}
+                  </div>
+                  <div className="w-8 h-8 rounded border border-white/10 bg-white/5 flex items-center justify-center">
+                    <QrCode className="w-5 h-5 text-slate-500" strokeWidth={1} />
+                  </div>
+                </div>
+                <div className="px-5 pb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Fingerprint className="w-3 h-3 text-cyber-cyan/60" strokeWidth={1.5} />
+                    <span className="text-[8px] font-mono text-slate-600">BIOMETRIC VERIFIED</span>
+                  </div>
+                  <span className="text-[8px] font-mono text-slate-600">EXP: 2027.12.31</span>
+                </div>
+              </div>
+            </div>
             {/* Pulse ring */}
-            <span className="absolute inset-0 rounded-full border border-cyber-cyan/40 animate-ping opacity-30" />
+            <span className="absolute inset-0 rounded-[0.2rem] border border-cyber-cyan/40 animate-ping opacity-30" />
           </motion.button>
         )}
       </AnimatePresence>
