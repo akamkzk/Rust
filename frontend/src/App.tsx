@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SplashIntro from '@/components/SplashIntro';
 import Home from '@/pages/Home';
 import Profile from '@/pages/Profile';
 import Forum from '@/pages/Forum';
@@ -36,8 +38,11 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
     <Router>
+      {showSplash && <SplashIntro onFinish={() => setShowSplash(false)} />}
       <div className="min-h-screen bg-cyber-black text-slate-200">
         <Navbar />
         <AnimatedRoutes />
