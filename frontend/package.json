@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "check": "tsc -b --noEmit"
+    "check": "tsc -b --noEmit",
+    "pages:dev": "vite build && wrangler pages dev ./dist",
+    "pages:deploy": "vite build && wrangler pages deploy ./dist",
+    "pages:preview": "vite build && wrangler pages project create --no-git-set-up && wrangler pages deploy ./dist"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.3",
@@ -24,6 +27,8 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.3.3",
+    "wrangler": "^4.14.2",
     "@eslint/js": "^9.25.0",
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.12",

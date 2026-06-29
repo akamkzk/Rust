@@ -1,0 +1,11 @@
+name = "nexus-social-platform"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+
+[vars]
+APP_ENV = "production"
+
+# Cloudflare Pages configuration
+# Build command: pnpm run build
+# Build output directory: /dist
+# Root directory: frontend/
